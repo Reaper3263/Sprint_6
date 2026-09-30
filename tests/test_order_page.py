@@ -1,33 +1,25 @@
+import allure
 import pytest
-from selenium import webdriver
 
-from config import MAIN_URL, GOOD_ORDER_TEST_DATA
+from test_data import GOOD_ORDER_TEST_DATA
 from pages.main_page import MainPage
 from pages.order_page import OrderPage
 
 
+@pytest.mark.usefixtures("driver")
 class TestMainPage:
     driver = None
     main_page = None
     order_page = None
 
-    @classmethod
-    def setup_class(cls):
-        cls.driver = webdriver.Firefox()
-        cls.main_page = MainPage(cls.driver)
-        cls.order_page = OrderPage(cls.driver)
-        cls.driver.get(MAIN_URL)
-
-    @classmethod
-    def teardown_class(cls):
-        cls.driver.quit()
-
+    @allure.title("Тест успешного заказа")
     @pytest.mark.parametrize(
         "first_name, last_name, address, metro_station, phone, delivery_date, rental_period, color, comment",
         GOOD_ORDER_TEST_DATA
     )
     def test_good_order(
             self,
+            driver,
             first_name,
             last_name,
             address,
@@ -38,6 +30,9 @@ class TestMainPage:
             color,
             comment,
     ):
+        self.main_page = MainPage(driver)
+        self.order_page = OrderPage(driver)
+
         self.main_page.click_order_btn()
         self.order_page.set_text_to_input("* Имя", first_name)
         self.order_page.set_text_to_input("* Фамилия", last_name)
