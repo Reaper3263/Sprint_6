@@ -1,5 +1,3 @@
-from selenium.common import NoSuchElementException
-
 from selenium.webdriver import Keys
 from locators import CONTINUE_BTN, ORDER_BTN, YES_BTN, CHECK_STATUS_BTN, get_textbox_btn_locator,\
     get_search_text_locator, get_search_input_by_placeholder_locator
@@ -8,28 +6,30 @@ from pages.base_page import BasePage
 
 class OrderPage(BasePage):
     def set_text_to_input(self, text_to_find, text_to_set):
-        element = self.driver.find_element(*get_search_input_by_placeholder_locator(text_to_find))
-        element.send_keys(text_to_set)
-        element.send_keys(Keys.ESCAPE)
+        locator = get_search_input_by_placeholder_locator(text_to_find)
+        self.enter_text(locator, text_to_set, key_to_send=Keys.ESCAPE)
 
     def set_text_to_dropdown_input(self, text_to_find, text_to_set):
-        try:
-            element = self.driver.find_element(*get_search_input_by_placeholder_locator(text_to_find))
-        except NoSuchElementException:
-            element = self.driver.find_element(*get_search_text_locator(text_to_find))
-        element.click()
-        self.driver.find_element(*get_search_text_locator(text_to_set)).click()
+        input_locator = get_search_input_by_placeholder_locator(text_to_find)
+        text_locator = get_search_text_locator(text_to_find)
+
+        if self.is_element_present(input_locator):
+            self.click(input_locator)
+        else:
+            self.click(text_locator)
+
+        self.click_searched_text(text_to_set)
 
     def set_textbox_value(self, check_box_value):
-        self.driver.find_element(*get_textbox_btn_locator(check_box_value)).click()
+        self.click(get_textbox_btn_locator(check_box_value))
 
     def click_continue_btn(self):
-        self.driver.find_element(*CONTINUE_BTN).click()
+        self.click(CONTINUE_BTN)
 
     def submit_order(self):
-        self.driver.find_element(*ORDER_BTN).click()
-        self.driver.find_element(*YES_BTN).click()
+        self.click(ORDER_BTN)
+        self.click(YES_BTN)
 
     def close_order(self):
-        self.driver.find_element(*CHECK_STATUS_BTN).click()
+        self.click(CHECK_STATUS_BTN)
         
